@@ -12,33 +12,27 @@ public class NetworkInput : NetworkBehaviour
 	public Vector3 realVelocity;
 	[SyncVar]
 	public Vector3 realRotation;
-	//		private float lastTime;
 
-	public float alpha;
+	Rigidbody _rb;
+
+	void Start () {
+		_rb = gameObject.GetComponent<Rigidbody>();
+	}
 
 	void Update ()
 	{
 
-		//		alpha = 0.1f / (Time.time - lastTime) / .03f;
-
-		if (isLocalPlayer) {
+		if (isServer) {
 			realPosition = transform.position;
-			realVelocity = GetComponent<Rigidbody> ().velocity;
-			CmdSync (transform.position, GetComponent<Rigidbody> ().velocity, transform.eulerAngles);
-		} else {
+			realVelocity = _rb.velocity;
+			realRotation = transform.eulerAngles;
+		}
+		else {
 
 			transform.DOKill ();
 			transform.DOMove (realPosition, 0.1f, false);
 			transform.DORotate (realRotation, 0.1f);
-			GetComponent<Rigidbody> ().velocity = realVelocity;	
+			_rb.velocity = realVelocity;	
 		}
-	}
-
-	[Command]
-	void CmdSync (Vector3 position, Vector3 velocity, Vector3 rotation)
-	{
-		realPosition = position;
-		realVelocity = velocity;
-		realRotation = rotation;
 	}
 }
